@@ -280,13 +280,18 @@
             if (GeolocationCache.ContainsKey(ActivityMachineAddress))
                 return GeolocationCache[ActivityMachineAddress];
 
-            string location, locationCity, locationRegion, locationCountry = "";
+            string location = "", locationCity = "", locationRegion = "", locationCountry = "";
 
             try
             {
-                locationCity = await App.HttpClient.GetStringAsync($"https://ipinfo.io/{ActivityMachineAddress}/city");
-                locationRegion = await App.HttpClient.GetStringAsync($"https://ipinfo.io/{ActivityMachineAddress}/region");
-                locationCountry = await App.HttpClient.GetStringAsync($"https://ipinfo.io/{ActivityMachineAddress}/country");
+                var locationInformation = await Http.GetJson<IPInfoResponse>($"https://ipinfo.io/{ActivityMachineAddress}/json");
+
+                if (locationInformation is not null)
+                {
+                    locationCity = locationInformation.IP;
+                    locationRegion = locationInformation.Region;
+                    locationCountry = locationInformation.Country;
+                }
             }
             catch (Exception ex)
             {
